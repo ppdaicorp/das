@@ -211,9 +211,9 @@ public class ShardingManager {
         
         for(String shardId: shards)
             dbSet.validate(shardId);
-        
-        detectDistributedTransaction(shards);
+
         hints.appendDiagnose("ShardID", shards);
+        detectDistributedTransaction(shards);
         return shards;
     }
 
@@ -245,17 +245,20 @@ public class ShardingManager {
     }
     
     public static Set<String> locateTableShards(String appId, String logicDbName, Hints hints, ConditionList conditions) throws SQLException {
+        hints.appendDiagnose("ConditionList", Objects.toString(conditions, "conditions is null"));
         ShardingStrategy strategy = getDatabaseSet(appId, logicDbName).getStrategy();
 
         String tableShardId = locateTableShardId(appId, logicDbName, hints);//hints.getTableShardId();
 
+        Set<String> shards = new HashSet<>();
         if(tableShardId != null) {
-            Set<String> shards = new HashSet<>();
             shards.add(tableShardId);
-            return shards;
+        } else {
+            shards = strategy.locateTableShards(new TableShardingContext(appId, logicDbName, null, strategy.getAllTableShards(), hints, conditions));
         }
 
-        return strategy.locateTableShards(new TableShardingContext(appId, logicDbName, null, strategy.getAllTableShards(), hints, conditions));
+        hints.appendDiagnose("TableShardID", shards);
+        return shards;
     }
 
     public static void detectDistributedTransaction(Set<String> shardIds) throws SQLException {

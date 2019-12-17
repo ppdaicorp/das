@@ -75,6 +75,20 @@ public class Hints {
     }
 
     /**
+     * Append diagnose info
+     *
+     * @param key
+     * @param info
+     * @return Hints
+     */
+    public Hints appendDiagnose(String key, Object info) {
+        if(isDiagnose()) {
+            dasDiagnose.append(key, info);
+        }
+        return this;
+    }
+
+    /**
      * Set the generated ID back into the entity.
      *
      * @return this {@code Hints}

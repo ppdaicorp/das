@@ -67,9 +67,6 @@ public abstract class AbstractConditionStrategy extends AbstractShardingStrategy
         Set<String> dbShards = ctx.hasShardValue() ?
                 locateDbShardsByValue(ctx, ctx.getShardValue()):
                     locateShards(this::isDbShardingRelated, this::locateDbShards, ctx, ctx.getConditions());
-        if(ctx.getHints().isDiagnose()) {
-            ctx.getHints().getDiagnose().append("db shards of AbstractConditionStrategy", dbShards.toString());
-        }
         return dbShards;
     }
 
@@ -78,9 +75,6 @@ public abstract class AbstractConditionStrategy extends AbstractShardingStrategy
         Set<String> tableShards = ctx.hasTableShardValue() ?
                 locateTableShardsByValue(ctx, ctx.getTableShardValue()) :
                     locateShards((tableCtx)->isTableShardingRelated((TableConditionContext)tableCtx), (tableCtx)->locateTableShards((TableConditionContext)tableCtx), ctx, ctx.getConditions());
-        if(ctx.getHints().isDiagnose()) {
-            ctx.getHints().getDiagnose().append("table shards of AbstractConditionStrategy", tableShards.toString());
-        }
         return tableShards;
     }
 

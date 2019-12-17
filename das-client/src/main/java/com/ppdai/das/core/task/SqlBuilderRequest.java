@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -136,9 +135,6 @@ public class SqlBuilderRequest<T> implements SqlRequest<T>{
             this.hints = hints;
             this.task = task;
             conditions = provider.buildConditions();
-            if(hints.isDiagnose()) {
-                hints.getDiagnose().append("ConditionList", Objects.toString(conditions, "conditions is null"));
-            }
             this.parameters = parameters;
             this.merger = provider.buildMerger();
         }

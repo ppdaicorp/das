@@ -337,7 +337,7 @@ public class Hints {
 
         setVersionInfo(versionInfo);
         allowPartial();
-        set(HintEnum.shardBy, new LinkedList<ColumnOrder>());
+        set(HintEnum.sortColumns, new LinkedList<ColumnOrder>());
     }
 
     /**
@@ -674,12 +674,12 @@ public class Hints {
      */
     public Hints sortBy(ColumnOrder... orders) {
         Preconditions.checkArgument(orders != null && orders.length > 0);
-        ((List<ColumnOrder>) get(HintEnum.shardBy)).addAll(Arrays.asList(orders));
+        ((List<ColumnOrder>) get(HintEnum.sortColumns)).addAll(Arrays.asList(orders));
         return this;
     }
 
     public List<ColumnOrder> getSorter() {
-        return (List<ColumnOrder>) get(HintEnum.shardBy);
+        return (List<ColumnOrder>) get(HintEnum.sortColumns);
     }
 
     /**

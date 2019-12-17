@@ -259,4 +259,9 @@ public enum HintEnum {
      * when select all columns, use column names instead of *
      */
     selectByNames,
+
+	/**
+	 * Columns to sort in-memory
+	 */
+	sortColumns
 }

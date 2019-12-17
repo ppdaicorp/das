@@ -1,7 +1,8 @@
 package com.ppdai.das.client;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,8 +36,6 @@ public class Hints {
     private DasVersionInfo versionInfo;
 
     private static final Object NULL = new Object();
-
-    private List<ColumnOrder> sorter = new ArrayList<>();
 
     private boolean crossShardsPageRoughly = false;
 
@@ -338,6 +337,7 @@ public class Hints {
 
         setVersionInfo(versionInfo);
         allowPartial();
+        set(HintEnum.shardBy, new LinkedList<ColumnOrder>());
     }
 
     /**
@@ -672,15 +672,14 @@ public class Hints {
      * @param orders
      * @return
      */
-    public Hints setSorter(ColumnOrder... orders) {
-        for(Object order : orders) {
-            this.sorter.add((ColumnOrder) order);
-        }
+    public Hints sortBy(ColumnOrder... orders) {
+        Preconditions.checkArgument(orders != null && orders.length > 0);
+        ((List<ColumnOrder>) get(HintEnum.shardBy)).addAll(Arrays.asList(orders));
         return this;
     }
 
     public List<ColumnOrder> getSorter() {
-        return sorter;
+        return (List<ColumnOrder>) get(HintEnum.shardBy);
     }
 
     /**

@@ -10,7 +10,7 @@
 		<junit-version>4.13</junit-version>
 		<javax-persistence-version>1.0.2</javax-persistence-version>
 		<sqljdbc-version>6.2.2.jre7.ctrip</sqljdbc-version>
-		<mysql-connector-version>5.1.44</mysql-connector-version>
+		<mysql-connector-version>8.0.16</mysql-connector-version>
 		<oracle-jdbc-thin-version>11.2.0.4</oracle-jdbc-thin-version>
 		<tomcat-jdbc-version>8.5.11</tomcat-jdbc-version>
 		<javax.servlet-api-version>3.1-b09</javax.servlet-api-version>

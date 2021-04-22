@@ -4,16 +4,6 @@
 	<!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径-->
 	<springProperty scope="context" name="logdir" source="logback.logdir"/>
 
-<!--	<appender name="kafka" class="com.ppdai.logclient.logback.KafkaAppender">
-		<layout>
-			<pattern>%date [%thread] %-5level %logger{36}- %msg%n</pattern>
-		</layout>
-		<topic>framework.log</topic>
-		<reportTopic>framework.metric</reportTopic>
-		<appId>1000002592</appId>
-		<bootstrapServers>logkafkafat01.ppdaicorp.com:9092,logkafkafat02.ppdaicorp.com:9092,logkafkafat03.ppdaicorp.com:9092,logkafkafat04.ppdaicorp.com:9092,logkafkafat05.ppdaicorp.com:9092</bootstrapServers>
-	</appender>-->
-
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<withJansi>true</withJansi>
 		<encoder>

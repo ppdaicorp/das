@@ -93,7 +93,7 @@ public class TableDataProcessor extends AbstractDataPreparer {
 
     private void prepareTable(final JavaCodeGenContext ctx, final Progress progress,
                               final Queue<JavaTableHost> _tableHosts, final TaskTableView tableViewSp, final String[] tableNames,
-                              final DatabaseCategory dbCategory) {
+                              final DatabaseCategory dbCategory) throws Exception {
         for (final String tableName : tableNames) {
             ExecuteResult result = new ExecuteResult(
                     "Build Table[" + tableViewSp.getAlldbs_id() + "." + tableName + "] Host");

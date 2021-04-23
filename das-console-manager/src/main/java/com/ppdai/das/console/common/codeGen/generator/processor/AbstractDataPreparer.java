@@ -60,81 +60,76 @@ public class AbstractDataPreparer {
         }
     }
 
-    protected JavaTableHost buildTableHost(JavaCodeGenContext context, TaskTableView taskTableView, String tableName, DatabaseCategory dbCategory) {
+    protected JavaTableHost buildTableHost(JavaCodeGenContext context, TaskTableView taskTableView, String tableName, DatabaseCategory dbCategory) throws Exception {
         JavaTableHost tableHost = new JavaTableHost();
-        try {
-            if (!DbUtils.tableExists(taskTableView.getAlldbs_id(), tableName)) {
-                throw new Exception(String.format("Table[%s.%s] doesn't exist.", taskTableView.getAlldbs_id(), tableName));
-            }
-            Integer field_type = taskTableView.getField_type();
-            tableHost.setPackageName(context.getNamespace());
-            tableHost.setDatabaseCategory(getDatabaseCategory(taskTableView.getAlldbs_id()));
-            tableHost.setDbSetName(taskTableView.getDbsetName());
-            tableHost.setTableName(tableName);
-            tableHost.setPojoClassName(getPojoClassName(taskTableView.getPrefix(), taskTableView.getSuffix(), tableName));
-            tableHost.setSp(taskTableView.getCud_by_sp());
-            tableHost.setApi_list(taskTableView.getApi_list());
-            tableHost.setPojoViewName(taskTableView.getView_names());
-            tableHost.setCustomTableame(taskTableView.getCustom_table_name());
-            tableHost.setField_type(field_type);
-            // tableHost.setLength(tableViewSp.getLength());
+        if (!DbUtils.tableExists(taskTableView.getAlldbs_id(), tableName)) {
+            throw new RuntimeException(String.format("Table[%s] doesn't exist.", tableName));
+        }
+        Integer field_type = taskTableView.getField_type();
+        tableHost.setPackageName(context.getNamespace());
+        tableHost.setDatabaseCategory(getDatabaseCategory(taskTableView.getAlldbs_id()));
+        tableHost.setDbSetName(taskTableView.getDbsetName());
+        tableHost.setTableName(tableName);
+        tableHost.setPojoClassName(getPojoClassName(taskTableView.getPrefix(), taskTableView.getSuffix(), tableName));
+        tableHost.setSp(taskTableView.getCud_by_sp());
+        tableHost.setApi_list(taskTableView.getApi_list());
+        tableHost.setPojoViewName(taskTableView.getView_names());
+        tableHost.setCustomTableame(taskTableView.getCustom_table_name());
+        tableHost.setField_type(field_type);
+        // tableHost.setLength(tableViewSp.getLength());
 
-            // 主键及所有列
-            List<String> primaryKeyNames = DbUtils.getPrimaryKeyNames(taskTableView.getAlldbs_id(), tableName);
-            List<AbstractParameterHost> allColumnsAbstract = DbUtils.getAllColumnNames(taskTableView.getAlldbs_id(),
-                    tableName, new JavaColumnNameResultSetExtractor(taskTableView.getAlldbs_id(), tableName, dbCategory));
-            if (null == allColumnsAbstract) {
-                throw new Exception(String.format("The column names of table[%s, %s] is null",
-                        taskTableView.getAlldbs_id(), tableName));
-            }
-            List<JavaParameterHost> allColumns = new ArrayList<>();
-            for (AbstractParameterHost h : allColumnsAbstract) {
-                JavaParameterHost host = (JavaParameterHost) h;
-                host.setField_type(field_type);
+        // 主键及所有列
+        List<String> primaryKeyNames = DbUtils.getPrimaryKeyNames(taskTableView.getAlldbs_id(), tableName);
+        List<AbstractParameterHost> allColumnsAbstract = DbUtils.getAllColumnNames(taskTableView.getAlldbs_id(),
+                tableName, new JavaColumnNameResultSetExtractor(taskTableView.getAlldbs_id(), tableName, dbCategory));
+        if (null == allColumnsAbstract) {
+            throw new RuntimeException(String.format("The column names of table[%s] is null", tableName));
+        }
+        List<JavaParameterHost> allColumns = new ArrayList<>();
+        for (AbstractParameterHost h : allColumnsAbstract) {
+            JavaParameterHost host = (JavaParameterHost) h;
+            host.setField_type(field_type);
                 /*if (field_type == DataFieldTypeEnum.UTIL_DATE.getType() && DataFieldTypeEnum.SQL_TIMESTAMP.getDetail().equals(host.getJavaClass().getName())) {
                     host.setJavaClass(DataFieldTypeEnum.UTIL_DATE.getJavaClass());
                 }*/
-                allColumns.add(host);
+            allColumns.add(host);
+        }
+
+        if (CollectionUtils.isNotEmpty(allColumns)) {
+            List<JavaParameterHost> list = allColumns.stream().filter(field -> DataFieldTypeEnum.SQL_DATE.getDetail().equals(field.getJavaClass().getName())).collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(list)) {
+                allColumns.stream().forEach(p -> p.setSqlDateExist(true));
             }
+        }
 
-            if (CollectionUtils.isNotEmpty(allColumns)) {
-                List<JavaParameterHost> list = allColumns.stream().filter(field -> DataFieldTypeEnum.SQL_DATE.getDetail().equals(field.getJavaClass().getName())).collect(Collectors.toList());
-                if (CollectionUtils.isNotEmpty(list)) {
-                    allColumns.stream().forEach(p -> p.setSqlDateExist(true));
-                }
+        List<JavaParameterHost> primaryKeys = new ArrayList<>();
+        boolean hasIdentity = false;
+        String identityColumnName = null;
+        for (JavaParameterHost h : allColumns) {
+            if (!hasIdentity && h.isIdentity()) {
+                hasIdentity = true;
+                identityColumnName = h.getName();
             }
-
-            List<JavaParameterHost> primaryKeys = new ArrayList<>();
-            boolean hasIdentity = false;
-            String identityColumnName = null;
-            for (JavaParameterHost h : allColumns) {
-                if (!hasIdentity && h.isIdentity()) {
-                    hasIdentity = true;
-                    identityColumnName = h.getName();
-                }
-                if (primaryKeyNames.contains(h.getName())) {
-                    h.setPrimary(true);
-                    primaryKeys.add(h);
-                }
+            if (primaryKeyNames.contains(h.getName())) {
+                h.setPrimary(true);
+                primaryKeys.add(h);
             }
+        }
 
-            List<TaskAuto> currentTableBuilders =
-                    filterExtraMethods(context, taskTableView.getAlldbs_id(), tableName);
-            List<JavaMethodHost> methods = buildSqlBuilderMethodHost(allColumns, currentTableBuilders);
+        List<TaskAuto> currentTableBuilders =
+                filterExtraMethods(context, taskTableView.getAlldbs_id(), tableName);
+        List<JavaMethodHost> methods = buildSqlBuilderMethodHost(allColumns, currentTableBuilders);
 
-            tableHost.setFields(allColumns);
-            tableHost.setPrimaryKeys(primaryKeys);
-            tableHost.setHasIdentity(hasIdentity);
-            tableHost.setIdentityColumnName(identityColumnName);
-            tableHost.setMethods(methods);
+        tableHost.setFields(allColumns);
+        tableHost.setPrimaryKeys(primaryKeys);
+        tableHost.setHasIdentity(hasIdentity);
+        tableHost.setIdentityColumnName(identityColumnName);
+        tableHost.setMethods(methods);
 
-            if (tableHost.isSp()) {
-                tableHost.setSpInsert(getSpaOperation(taskTableView.getAlldbs_id(), tableName, "i"));
-                tableHost.setSpUpdate(getSpaOperation(taskTableView.getAlldbs_id(), tableName, "u"));
-                tableHost.setSpDelete(getSpaOperation(taskTableView.getAlldbs_id(), tableName, "d"));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (tableHost.isSp()) {
+            tableHost.setSpInsert(getSpaOperation(taskTableView.getAlldbs_id(), tableName, "i"));
+            tableHost.setSpUpdate(getSpaOperation(taskTableView.getAlldbs_id(), tableName, "u"));
+            tableHost.setSpDelete(getSpaOperation(taskTableView.getAlldbs_id(), tableName, "d"));
         }
         return tableHost;
     }

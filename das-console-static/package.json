@@ -33,7 +33,7 @@
     "history": "^1.13.1",
     "immutable": "^3.8.1",
     "jquery": "^3.2.1",
-    "lodash": "^3.10.1",
+    "lodash": "^4.17.19",
     "material-ui": "^0.19.0",
     "moment": "^2.22.2",
     "rc-queue-anim": "^1.6.6",

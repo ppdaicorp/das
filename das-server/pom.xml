@@ -6,7 +6,7 @@
     <properties>
         <ver.version>${project.version}</ver.version>
         <file_encoding>UTF-8</file_encoding>
-        <junit-version>4.4</junit-version>
+        <junit-version>4.13.1</junit-version>
         <slf4j-api-version>1.7.12</slf4j-api-version>
         <das-client-version>2.3.5-rc1</das-client-version>
     </properties>

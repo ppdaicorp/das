@@ -7,7 +7,7 @@
 	<version>2.7.1</version>
 	<properties>
 		<ver.version>${project.version}</ver.version>
-		<junit-version>4.13</junit-version>
+		<junit-version>4.13.1</junit-version>
 		<javax-persistence-version>1.0.2</javax-persistence-version>
 		<sqljdbc-version>6.2.2.jre7.ctrip</sqljdbc-version>
 		<mysql-connector-version>8.0.22</mysql-connector-version>
